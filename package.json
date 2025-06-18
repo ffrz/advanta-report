@@ -9,7 +9,9 @@
     "start": "parcel",
     "build": "parcel build --public-url /advanta-report/",
     "predeploy": "npm run build",
-"deploy": "gh-pages -d dist"
+    "emulators": "firebase emulators:start --only auth,firestore",
+    "emulators:persist": "firebase emulators:start --only auth,firestore --export-on-exit ./firebase-emulator-data --import ./firebase-emulator-data",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "firebase": "^9.22.1",
