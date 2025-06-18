@@ -536,6 +536,18 @@ function EditProfilePage({ userProfile, navigateTo, setAppModalMessage }) {
   const [workArea, setWorkArea] = useState(userProfile.workArea);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const reset = () => {
+    setName(userProfile.name);
+    setWorkArea(userProfile.workArea);
+    setProfilePhoto(null);
+  }
+  // useEffect(() => {
+  //   if (userProfile) {
+  //     setName(userProfile.name);
+  //     setWorkArea(userProfile.workArea);
+  //     setProfilePhoto(null); // Pastikan foto profil reset saat data user baru dimuat
+  //   }
+  // }, [userProfile]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -555,7 +567,7 @@ function EditProfilePage({ userProfile, navigateTo, setAppModalMessage }) {
         await setDoc(publicBsDocRef, { name, workArea }, { merge: true });
       }
       setAppModalMessage("Profil berhasil diperbarui!");
-      navigateTo("dashboard");
+      // navigateTo("dashboard");
     } catch (error) {
       console.error("Gagal memperbarui profil:", error);
       setAppModalMessage("Gagal memperbarui profil.");
@@ -598,7 +610,7 @@ function EditProfilePage({ userProfile, navigateTo, setAppModalMessage }) {
           <div className="flex gap-4 pt-4">
             <button
               type="button"
-              onClick={() => navigateTo("dashboard")}
+              onClick={reset}
               className="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300"
             >
               Batal
@@ -1112,7 +1124,7 @@ function DashboardBS({
       id: "edit-profile",
       label: "Edit Profil",
       icon: "edit",
-      action: () => navigateTo("edit-profile"),
+      // action: () => navigateTo("edit-profile"),
     },
   ];
   return (
@@ -1182,6 +1194,13 @@ function DashboardBS({
               setAppModalMessage={setAppModalMessage}
             />
           )}
+          {page === "edit-profile" && (
+            <EditProfilePage
+              userProfile={userProfile}
+              navigateTo={navigateTo}
+              setAppModalMessage={setAppModalMessage}
+            />
+          )}
         </div>
       </main>
     </div>
@@ -1207,7 +1226,7 @@ function DashboardAgronomist({
       id: "edit-profile",
       label: "Edit Profil",
       icon: "edit",
-      action: () => navigateTo("edit-profile"),
+      // action: () => navigateTo("edit-profile"),
     },
   ];
   const requestDeleteDemplot = (demplotId) => {
@@ -1304,6 +1323,13 @@ function DashboardAgronomist({
             <TargetForm setAppModalMessage={setAppModalMessage} />
           )}
           {page === "rekap" && <TargetRekap />}
+          {page === "edit-profile" && (
+            <EditProfilePage
+              userProfile={userProfile}
+              navigateTo={navigateTo}
+              setAppModalMessage={setAppModalMessage}
+            />
+          )}
         </div>
       </main>
       {demplotToDelete && (
