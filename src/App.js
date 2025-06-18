@@ -5,7 +5,8 @@ import {
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
     signOut, 
-    onAuthStateChanged 
+    onAuthStateChanged,
+    connectAuthEmulator
 } from 'firebase/auth';
 import { 
     getFirestore, 
@@ -20,38 +21,92 @@ import {
     onSnapshot, 
     serverTimestamp, 
     getDocs, 
-    deleteDoc 
+    deleteDoc,
+    connectFirestoreEmulator
 } from 'firebase/firestore';
 
-// --- Konfigurasi Firebase ---
+// // --- Konfigurasi Firebase ---
+// const firebaseConfig = {
+//     apiKey: "AIzaSyA9A33X1VjW5VveGN2DBVJV7-8yjR77NyY",
+//     authDomain: "advanta-report.firebaseapp.com",
+//     projectId: "advanta-report",
+//     storageBucket: "advanta-report.appspot.com",
+//     messagingSenderId: "1049506934296",
+//     appId: "1:1049506934296:web:b4656d2be9456a1bc21d6d",
+//     measurementId: "G-ETGNNL41R5"
+// };
+
+// // --- Inisialisasi Firebase ---
+// let app, auth, db, isFirebaseInitialized = false;
+// try {
+//     if (getApps().length === 0) {
+//         app = initializeApp(firebaseConfig);
+//     } else {
+//         app = getApps()[0];
+//     }
+//     auth = getAuth(app);
+//     db = getFirestore(app);
+//     isFirebaseInitialized = true;
+//     console.log("Firebase initialized successfully.");
+// } catch (error) {
+//     console.error("Kesalahan Inisialisasi Firebase:", error);
+// }
+
+// // --- Konstanta Aplikasi ---
+// const appId = "advanta-report";
+
+// --- Konfigurasi Firebase (DIKOSONGKAN UNTUK MENGHINDARI KONEKSI PRODUKSI) ---
+// Ketika Anda hanya ingin menggunakan emulator, Anda tidak perlu mengisi konfigurasi ini
+// dengan detail proyek produksi. SDK Firebase akan mengabaikannya saat emulator terhubung.
+// Namun, initializeApp tetap memerlukan objek konfigurasi.
 const firebaseConfig = {
-    apiKey: "AIzaSyA9A33X1VjW5VveGN2DBVJV7-8yjR77NyY",
-    authDomain: "advanta-report.firebaseapp.com",
-    projectId: "advanta-report",
-    storageBucket: "advanta-report.appspot.com",
-    messagingSenderId: "1049506934296",
-    appId: "1:1049506934296:web:b4656d2be9456a1bc21d6d",
-    measurementId: "G-ETGNNL41R5"
+    apiKey: "DUMMY_API_KEY", // Bisa diisi dummy, karena tidak akan digunakan
+    authDomain: "dummy-project.firebaseapp.com", // Bisa diisi dummy
+    projectId: "dummy-project", // Bisa diisi dummy
+    storageBucket: "dummy-project.appspot.com", // Bisa diisi dummy
+    messagingSenderId: "0", // Bisa diisi dummy
+    appId: "0:0:web:0", // Bisa diisi dummy
+    measurementId: "G-0" // Bisa diisi dummy
 };
 
 // --- Inisialisasi Firebase ---
 let app, auth, db, isFirebaseInitialized = false;
 try {
     if (getApps().length === 0) {
+        // Inisialisasi Firebase app dengan konfigurasi dummy
+        // Ini diperlukan untuk mendapatkan instance auth dan db.
+        // Koneksi ke emulator akan MENGGANTIKAN konfigurasi ini.
         app = initializeApp(firebaseConfig);
     } else {
         app = getApps()[0];
     }
+
     auth = getAuth(app);
     db = getFirestore(app);
+
+    // --- BAGIAN PENTING: Koneksi Eksklusif ke Emulator ---
+    // Pastikan emulator berjalan di port default atau port yang Anda konfigurasikan.
+    console.log("Connecting ONLY to Firebase Emulators (local data).");
+
+    // Port default untuk Auth Emulator adalah 9099
+    connectAuthEmulator(auth, 'http://localhost:9099');
+    // Port default untuk Firestore Emulator adalah 8080
+    connectFirestoreEmulator(db, 'localhost', 8080);
+
+    // Jika Anda juga menggunakan Firebase Storage, tambahkan baris ini (pastikan sudah di-import):
+    // import { getStorage, connectStorageEmulator } from 'firebase/storage';
+    // const storage = getStorage(app);
+    // connectStorageEmulator(storage, 'localhost', 9199);
+
     isFirebaseInitialized = true;
-    console.log("Firebase initialized successfully.");
+    console.log("Firebase initialized successfully and connected to local emulators.");
 } catch (error) {
-    console.error("Kesalahan Inisialisasi Firebase:", error);
+    console.error("Kesalahan Inisialisasi Firebase atau Koneksi Emulator:", error);
 }
 
 // --- Konstanta Aplikasi ---
-const appId = "advanta-report";
+// appId ini tidak mempengaruhi koneksi Firebase itu sendiri, hanya identifikasi internal aplikasi jika diperlukan
+const appId = "advanta-report-local"; // Anda bisa mengubahnya untuk indikasi lokal
 
 // --- Komponen & Fungsi Bantuan ---
 const resizeImage = (file) => new Promise((resolve, reject) => {
